@@ -1,132 +1,110 @@
-//const game = new BaseballGame();
+const game = new BaseballGame();
 let Newbutton = document.querySelector("#new");
 let digitButtons = document.querySelectorAll('.digit');
 const guessSpan = document.getElementById('guess');
 
-let num=[];
-
-// window.onload = function(e){
-//     newbuttonfunction();
-// }
+window.onload = function(e){
+    newbuttonfunction();
+}
 
 Newbutton.addEventListener("click", newbuttonfunction)
 function newbuttonfunction() {
-    num =[];
-    let selectedDigits =[];
-    document.getElementById('tbody-stat').innerHTML ='';
+    game.num = [];
+    game.selectedDigits = [];
+    game.ball = 0;
+    game.strike = 0;
+    document.getElementById('tbody-stat').innerHTML = '';
     document.getElementById('guess').innerHTML = '';
+    const randomValueTest = document.querySelector('#key');
+    game.num[0] = Math.floor(Math.random() * 10);
+    game.num[1] = Math.floor(Math.random() * 10);
+    game.num[2] = Math.floor(Math.random() * 10);
 
-    let randomValueTest = document.querySelector('#key');
-    
-    
-    num[0]= Math.floor(Math.random() * 10);
-    num[1] = Math.floor(Math.random() * 10);
-    num[2] = Math.floor(Math.random() * 10);
+    while (game.num[0] == game.num[1]) {
+        game.num[1] = Math.floor(Math.random() * 10);
+    }
+    while ((game.num[1] == game.num[2]) || (game.num[2] == game.num[0])) {
+        game.num[2] = Math.floor(Math.random() * 10);
+    }
 
-    while(num[0] == num[1]) {
-        num[1]= Math.floor(Math.random() * 10);
-    }
-    while((num[1] == num[2]) || (num[2] == num[0])) {
-        num[2] = Math.floor(Math.random() * 10);
-    }
-    //let num2 = Math.floor(Math.random() * 10);
-    //let num3 = Math.floor(Math.random() * 10);
     randomValueTest.innerHTML = `
-    ${num[0]},${num[1]},${num[2]}
+    ${game.num[0]}, ${game.num[1]}, ${game.num[2]}
     `;
 
-    console.log(randomValueTest.innerHTML);
 
     digitButtons.forEach(button => {
         button.disabled = false;
     });
 
-
-digitButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-        selectedDigits.push(parseInt(e.target.innerHTML));
-        button.disabled = true;
-        guessSpan.innerHTML = selectedDigits; 
-       // console.log(selectedDigits);
-        if(selectedDigits.length==3){
-            checkguess(selectedDigits,num)
-            selectedDigits=[];
-            
-            digitButtons.forEach(button => {
-                button.disabled = false;
+    digitButtons.forEach(button => {
+        button.onclick = function (e) {
+            game.selectedDigits.push(e.target.innerHTML);
+            digitButtons.forEach(btn => {
+                btn.disabled = false;
             });
-
+    
+         
+            button.disabled = true;
+    
+            
+            guessSpan.innerHTML = game.selectedDigits.join(', ');
+    
+            if (game.selectedDigits.length === 3) {
+                checkguess();
+                game.selectedDigits = [];
+            }
         }
     });
-});
-
-
-
     
-    
-
 }
 
 
 
+function checkguess() {
+    game.strike =0;
+    game.ball = 0;
 
 
-
-
-
-// Function to add a guess to the table
-function checkguess(guess, target) {
-    let strike = 0;
-    let ball=0; 
-    for(let i=0;i<3;i++){
-        if(guess[i] == target[i]){
-            strike += 1;
+    for (let i = 0; i < 3; i++) {
+        if (game.num[i] == game.selectedDigits[i]) {
+            game.strike += 1;
         }
     }
 
-    console.log(guess)
-    console.log(target)
-
-    for (let i= 0; i < 3; i++){
-        for (let j=0; j < 3; j++){
-            if(i==j){
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (i == j) {
                 j++;
             }
-            if(guess[i]== target[j]){
-                ball+= 1;
-    
+            if (game.num[i] == game.selectedDigits[j]) {
+                game.ball += 1;
+
             }
         }
     }
-
-    if(strike == 3){
-        alert('you win')
+   
+    if (game.strike == 3) {
+        alert(`you win with ${game.selectedDigits}`)
         digitButtons.forEach(button => {
             button.disabled = true;
         });
-    
     }
 
-
-const tableBody = document.getElementById('tbody-stat');
-
-   
-
-    const guessvalue= document.createElement('td');
-    const ballcount= document.createElement('td');
-    const strikecount= document.createElement('td');
-    guessvalue.innerHTML= guess;
-    ballcount.innerHTML= ball; 
-    strikecount.innerHTML= strike; 
-    const tr= document.createElement('tr'); 
-    tr.appendChild(guessvalue); 
-    tr.appendChild(ballcount); 
+    const tableBody = document.getElementById('tbody-stat');
+    const guessvalue = document.createElement('td');
+    const ballcount = document.createElement('td');
+    const strikecount = document.createElement('td');
+    guessvalue.innerHTML = game.selectedDigits;
+    ballcount.innerHTML = game.ball;
+    strikecount.innerHTML = game.strike;
+    const tr = document.createElement('tr');
+    tr.appendChild(guessvalue);
+    tr.appendChild(ballcount);
     tr.appendChild(strikecount);
     tableBody.appendChild(tr);
 
-   
-    guess ='';
-    
+
+
     document.getElementById('guess').innerHTML = '';
 
 }
